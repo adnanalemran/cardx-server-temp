@@ -3,7 +3,7 @@ let attemptsLeft;
 const maxAttempts = 3;
 
 function startGame() {
-  randomNumber = Math.floor(Math.random() * 2) + 1;
+  randomNumber = Math.floor(Math.random() * 10) + 1;
   attemptsLeft = maxAttempts;
   document.getElementById(
     "attemptsLeft"
