@@ -50,6 +50,15 @@
       src: "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-11.jpg",
     },
   ];
+
+  import { Alert } from "flowbite-svelte";
 </script>
+
+<div class="p-8">
+  <Alert>
+    <span class="font-medium">Info alert!</span>
+    Change a few things up and try submitting again.
+  </Alert>
+</div>
 
 <Gallery items={images} class="grid gap-4 grid-cols-2 md:grid-cols-3" />
