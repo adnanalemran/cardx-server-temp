@@ -52,6 +52,4 @@
   ];
 </script>
 
-<h1 class="text-red-400">Welcome to Adnan</h1>
-
-<Gallery items={images} class="gap-4 grid-cols-2 md:grid-cols-3" />
+<Gallery items={images} class="grid gap-4 grid-cols-2 md:grid-cols-3" />
