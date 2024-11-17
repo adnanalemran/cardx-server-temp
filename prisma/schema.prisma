@@ -1,0 +1,145 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id            Int            @id @default(autoincrement())
+  name          String
+  email         String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  users         User[]
+  subscriptions Subscription[]
+  paymentLists  PaymentList[] // Payments made by this tenant
+}
+
+model User {
+  id             Int           @id @default(autoincrement())
+  name           String
+  email          String        @unique
+  password       String
+  profileImage   String?
+  phoneNumber    String?
+  role           Role          @default(USER)
+  tenantId       Int
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  freeTrial      Boolean       @default(true)
+  trialEndDate   DateTime
+  remainingCards Int
+  tenant         Tenant        @relation(fields: [tenantId], references: [id])
+  subscriptionId Int?          @unique
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  cards          Card[]
+  refCode        String        @unique // Auto-generate logic to be implemented in app
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPPORT
+}
+
+model Subscription {
+  id            Int      @id @default(autoincrement())
+  plan          String // Plan name, e.g., 'Basic', 'Premium'
+  startDate     DateTime @default(now())
+  endDate       DateTime
+  status        String // 'Active', 'Cancelled', 'Expired'
+  paymentAmount Float
+  credits       Int
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  user          User?    @relation
+}
+
+model PaymentList {
+  id            Int      @id @default(autoincrement())
+  paymentTime   DateTime @default(now())
+  paymentAmount Float
+  paymentMethod String // e.g., 'credit_card', 'paypal'
+  tenantId      Int
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+}
+
+model Card {
+  id           Int           @id @default(autoincrement())
+  email        String?
+  companyName  String?
+  designation  String?
+  name         String
+  address      String?
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images       CardImage[]   @relation("CardToImages")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  userId       Int
+  phoneNumbers PhoneNumber[]
+  telNumbers   TelNumber[]
+  tags         Tag[]         @relation("CardTags")
+  categories   Category[]    @relation("CardCategories")
+  location     String?
+  events       Event[]       @relation
+  whatsApp     String?
+  linkedIn     String?
+  facebook     String?
+  wcChat       String?
+  line         String?
+  twitter      String?
+  isDeleted    Boolean       @default(false)
+}
+
+model CardImage {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String
+  imageAlt  String?
+  cardId    Int // Foreign key for Card
+  card      Card     @relation("CardToImages", fields: [cardId], references: [id], onDelete: Cascade) // Relation with Card
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  cards Card[] @relation("CardTags")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  cards Card[] @relation("CardCategories")
+}
+
+model PhoneNumber {
+  id        Int      @id @default(autoincrement())
+  number    String
+  type      String?
+  cardId    Int
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model TelNumber {
+  id        Int      @id @default(autoincrement())
+  number    String
+  type      String?
+  cardId    Int
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id            Int      @id @default(autoincrement())
+  eventName     String?
+  eventDate     String?
+  eventImage    String?
+  eventLocation String?
+  cardId        Int
+  card          Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+}
