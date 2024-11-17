@@ -25,8 +25,86 @@ app.use("/api", AzureExtractRoute);
 
 app.use("/api", BusnessCardRoute);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to the CardX Server");
+app.get("/", async (req: Request, res: Response) => {
+  try {
+    await prisma.$connect();
+
+    res.send(`
+      <html>
+      <head>
+      <style>
+        body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        }
+        .container {
+        text-align: center;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+        color: #333;
+        }
+        p {
+        color: #666;
+        }
+      </style>
+      </head>
+      <body>
+      <div class="container">
+        <h1>Welcome to the CardX Server!</h1>
+        <p>The database connection was successful.</p>
+      </div>
+      </body>
+      </html>
+    `);
+  } catch (error) {
+    res.status(500).send(`
+      <html>
+      <head>
+      <style>
+      body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      }
+      .container {
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+      color: #333;
+      }
+      p {
+      color: #666;
+      }
+      </style>
+      </head>
+      <body>
+      <div class="container">
+      <h1>Welcome to the CardX Server!</h1>
+      <p style="color: red;">There was an error connecting to the database: ${error}</p>
+      </div>
+      </body>
+      </html>
+    `);
+  }
 });
 
 app.listen(port, async () => {
